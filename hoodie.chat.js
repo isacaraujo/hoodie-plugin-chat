@@ -46,17 +46,29 @@ Hoodie.extend(function (hoodie) {
       hoodie.trigger('onmessage', message);
   });
 
+  function saveChatStatus() {
+    var defer = jQuery.Deferred();
+    var type = 'chatstatus';
+    var id = hoodie.id();
+    hoodie.store.find(type, id)
+    .then(function () {
+      var changed = {lastChatCheck: new Date()};
+      return hoodie.store.update(type, id, changed);
+    }).fail(function () {
+      var doc = { id: id, type: type, lastChatCheck: new Date() };
+      return hoodie.store.add(type, doc);
+    });
+    return defer.promise();
+  }
 
   function checkChatStatus() {
-    setTimeout(function () {
-      if (hoodie.account.username && hoodie.account.hasAccount() && !hoodie.account.hasAnonymousAccount()) {
-        hoodie.store.update('chatstatus', hoodie.id(), {lastChatCheck: new Date()})
-          .always(function () {
-            checkChatStatus();
-          });
-      }
-
-    }, 10000);
+    if (hoodie.account.username && hoodie.account.hasAccount() && !hoodie.account.hasAnonymousAccount()) {
+      saveChatStatus().always(function () {
+        setTimeout(function () {
+          checkChatStatus();
+        }, 10000);
+      });
+    }
   }
   checkChatStatus();
 
@@ -73,7 +85,7 @@ Hoodie.extend(function (hoodie) {
             if (task && task.chatstatus && task.chatstatus.lastChatCheck) {
               var check = window.moment(task.chatstatus.lastChatCheck)._d,
               now = window.moment()._d;
-              return window.moment.duration( now - check).asMinutes() < 5;
+              return window.moment.duration( now - check).asMinutes() < 1;
             } else {
               return false;
             }
