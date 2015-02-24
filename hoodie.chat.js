@@ -53,10 +53,16 @@ Hoodie.extend(function (hoodie) {
     hoodie.store.find(type, id)
     .then(function () {
       var changed = {lastChatCheck: new Date()};
-      return hoodie.store.update(type, id, changed);
+      hoodie.store.update(type, id, changed)
+              .then(defer.resolve)
+              .fail(defer.reject);
+      hoodie.remote.push();
     }).fail(function () {
       var doc = { id: id, type: type, lastChatCheck: new Date() };
-      return hoodie.store.add(type, doc);
+      hoodie.store.add(type, doc)
+              .then(defer.resolve)
+              .fail(defer.reject);
+      hoodie.remote.push();
     });
     return defer.promise();
   }
