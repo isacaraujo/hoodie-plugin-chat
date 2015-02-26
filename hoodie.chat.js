@@ -67,16 +67,16 @@ Hoodie.extend(function (hoodie) {
     return defer.promise();
   }
 
-  function checkChatStatus() {
-    if (hoodie.account.username && hoodie.account.hasAccount() && !hoodie.account.hasAnonymousAccount()) {
-      saveChatStatus().always(function () {
-        setTimeout(function () {
-          checkChatStatus();
-        }, 10000);
-      });
-    }
-  }
-  checkChatStatus();
+//  function checkChatStatus() {
+//    if (hoodie.account.username && hoodie.account.hasAccount() && !hoodie.account.hasAnonymousAccount()) {
+//      saveChatStatus().always(function () {
+//        setTimeout(function () {
+//          checkChatStatus();
+//        }, 10000);
+//      });
+//    }
+//  }
+//  checkChatStatus();
 
   hoodie.chat = {
 
